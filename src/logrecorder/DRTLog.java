@@ -87,8 +87,28 @@ public class DRTLog {
             wcf.setAlignment(Alignment.CENTRE);//设置对其格式
             wcf.setWrap(false);//设置文字是否换行
             //如果文件不存在则创建新的文件，新的文件中自动包含对应的表头
-            if (!file.exists())
-                createXLS(path,wcf);
+            if (!file.exists()){
+                try{
+                    file.createNewFile();
+                    //向新建的文件中添加表头
+                    WritableWorkbook writableWorkbook = Workbook.createWorkbook(file);
+                    WritableSheet sheet = writableWorkbook.createSheet("sheet",0);
+                    String[] elements = {"MuDistribution","partitions","parameters","Fmeasure","sdr_Fmeasure","Tmeasure","sdr_Tmeasure","time"};
+                    for (int i = 0; i < elements.length; i++) {
+                        sheet.addCell(new Label(i,0,elements[i],wcf));
+                        sheet.setColumnView(i,22);
+                    }
+                    writableWorkbook.write();
+                    writableWorkbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (RowsExceededException e) {
+                    e.printStackTrace();
+                } catch (WriteException e) {
+                    e.printStackTrace();
+                }
+            }
+
             //向文件中写入内容
             Workbook originalWorkbook = Workbook.getWorkbook(file);
             //在原来的基础上写入内容
@@ -127,6 +147,8 @@ public class DRTLog {
                 sheet.addCell(new Label(i,0,elements[i],wcf));
                 sheet.setColumnView(i,22);
             }
+            writableWorkbook.write();
+            writableWorkbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RowsExceededException e) {
@@ -134,12 +156,6 @@ public class DRTLog {
         } catch (WriteException e) {
             e.printStackTrace();
         }
-    }
-    public static void main(String[] args) {
-        DRTLog drtLog = new DRTLog();
-        List<String> lists = new ArrayList<String>();
-        lists.add("roa1");
-        drtLog.recordProcessInfo("test","M50-50","1","1","1",lists,"10","0.001");
     }
 
 }

@@ -92,10 +92,13 @@ public class DRT {
         List<String> methodsList = testMethods.getMethods();
         int[] partitions = {47,41,22,19,10};//记录每一个分区之中变异体的数量
         String[] distribution = {"M50-50","M60-40","M70-30","M80-20","M90-10"};
+//        String[] distribution = {"M50-50"};
         DRTLog drtLog = new DRTLog();
         int[] numOfPartitions = {20,3};
+//        int[] numOfPartitions = {20};
         Partition rptPartition = new Partition();
         double[] parameters = {0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.01,0.05,0.1,0.2,0.3,0.4,0.5};
+//        double[] parameters = {0.00001};
 
         for (int y = 0; y < distribution.length; y++) {//对不同的变异体集进行测试
             for (int i = 0; i < numOfPartitions.length; i++) {
@@ -121,6 +124,11 @@ public class DRT {
                                 mutants[l] = new BinSet();
                             }
                             mutants = ms.getMutantsList();//获得5中变异体分布的变异体集
+                            //对测试剖面进行初始化
+                            pd = new double[numOfPartitions[i]];
+                            for (int l = 0; l < pd.length; l++) {
+                                pd[l] = 1.0 / numOfPartitions[i];
+                            }
                             long start = System.currentTimeMillis();
 
                             for (int l = 0; l < beans.size();) {//选取测试用例
