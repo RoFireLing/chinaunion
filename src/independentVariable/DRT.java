@@ -90,7 +90,7 @@ public class DRT {
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
         TestMethods testMethods = new TestMethods();
         List<String> methodsList = testMethods.getMethods();
-        int[] partitions = {47,41,22,19,10};//记录每一个分区之中变异体的数量
+        int[] partitions = {40,35,20,14,10};//记录每一个分区之中变异体的数量
         String[] distribution = {"M50-50","M60-40","M70-30","M80-20","M90-10"};
 //        String[] distribution = {"M50-50"};
         DRTLog drtLog = new DRTLog();
@@ -106,11 +106,8 @@ public class DRT {
                     epsilon = parameters[x];
                     DRTMeasure drtMeasure = new DRTMeasure();
                     long totaltime = 0;//记录测试的总时间
+                    long start = System.currentTimeMillis();
                     for (int j = 0; j < SEEDS; j++) {
-                        double fcounter = 0.0 ;//记录30次的fmeasure的总合
-                        double tcounter = 0.0 ;//记录30次的tmeasure的总和
-                        double fmeasure = 0.0 ;
-                        double tmeasure = 0.0 ;
                         for (int k = 0; k < TESTTIMES; k++) {
                             int counter = 0 ;
                             List<Bean> beans = new ArrayList<Bean>();
@@ -129,8 +126,6 @@ public class DRT {
                             for (int l = 0; l < pd.length; l++) {
                                 pd[l] = 1.0 / numOfPartitions[i];
                             }
-                            long start = System.currentTimeMillis();
-
                             for (int l = 0; l < beans.size();) {//选取测试用例
                                 int partition = nextPartition();
                                 Bean bean;
@@ -172,19 +167,17 @@ public class DRT {
                                                 killedMutants.add(temp);
                                                 templist.add(temp);
                                                 if (killedMutants.size() == 1){
-                                                    fcounter += counter;
+                                                    drtMeasure.addFmeasure(counter);
                                                 }else if (killedMutants.size() == partitions[y]){
-                                                    long end = System.currentTimeMillis();
-                                                    totaltime += (end - start);
-                                                    tcounter += counter;
+                                                    drtMeasure.addTmeasure(counter);
                                                 }
                                                 break;
                                             }
                                         }
                                     }
                                     //记录1个测试用例在所有得变异体上执行之后的结果
-                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],String.valueOf(j),
-                                            String.valueOf(partition),String.valueOf(bean.getId()),templist,String.valueOf(partitions[y] - killedMutants.size()),String.valueOf(parameters[x]));
+//                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],String.valueOf(j),
+//                                            String.valueOf(partition),String.valueOf(bean.getId()),templist,String.valueOf(partitions[y] - killedMutants.size()),String.valueOf(parameters[x]));
                                     if (killedMutants.size() >= partitions[y]){
                                         break;
                                     }
@@ -201,15 +194,12 @@ public class DRT {
                                 }
                             }
                         }
-                        fmeasure = fcounter / TESTTIMES;
-                        tmeasure = tcounter /TESTTIMES;
-
-                        drtMeasure.addFmeasure(fmeasure);
-                        drtMeasure.addTmeasure(tmeasure);
                     }
+                    long end = System.currentTimeMillis();
+                    totaltime += (end - start);
                     double meanTime = Double.parseDouble(decimalFormat.format(totaltime / DIVISOR)) ;
                     drtLog.recordResult("drtResult.xls",drtMeasure.getMeanFmeasure(),drtMeasure.getMeanTmeasure(),
-                            drtMeasure.getstandardDevofFmeasure(),drtMeasure.getstandardDevofTmeasure(),numOfPartitions[i],
+                            drtMeasure.getStandardDevOfFmeasure(),drtMeasure.getStandardDevOfTmeasure(),numOfPartitions[i],
                             parameters[x],meanTime,distribution[y]);
                 }
             }
