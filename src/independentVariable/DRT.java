@@ -2,7 +2,6 @@ package independentVariable;
 
 import dependentVariable.DRTMeasure;
 import logrecorder.DRTLog;
-import logrecorder.RPTLog;
 import mutantSet.BinSet;
 import mutantSet.MutantSet;
 import mutantSet.TestMethods;
@@ -26,7 +25,7 @@ public class DRT {
     private static final int TESTTIMES = 30 ;
     private static final double DIVISOR = SEEDS * TESTTIMES;
     private static final String ORIGINAL_PACKAGE = "com.lyq.";
-    private static final int NUMOFTESTCASES = 500000;
+    private static final int NUMOFTESTCASES = 900000;
 
 
     Random r = new Random();
@@ -90,8 +89,10 @@ public class DRT {
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
         TestMethods testMethods = new TestMethods();
         List<String> methodsList = testMethods.getMethods();
-        int[] partitions = {40,35,20,14,10};//记录每一个分区之中变异体的数量
-        String[] distribution = {"M50-50","M60-40","M70-30","M80-20","M90-10"};
+//        int[] partitions = {40,35,20,14,10};//记录每一个分区之中变异体的数量
+        int[] partitions = {11};
+//        String[] distribution = {"M50-50","M60-40","M70-30","M80-20","M90-10"};
+        String[] distribution = {"LowFailureRate"};
 //        String[] distribution = {"M50-50"};
         DRTLog drtLog = new DRTLog();
         int[] numOfPartitions = {20,3};
@@ -110,6 +111,7 @@ public class DRT {
                     for (int j = 0; j < SEEDS; j++) {
                         for (int k = 0; k < TESTTIMES; k++) {
                             int counter = 0 ;
+                            int fmeasure = 0 ;
                             List<Bean> beans = new ArrayList<Bean>();
                             beans.clear();
                             beans = generateTestcases.generateTestcases(j,NUMOFTESTCASES);//获得指定随机数种子情况下的测试用例集
@@ -167,17 +169,21 @@ public class DRT {
                                                 killedMutants.add(temp);
                                                 templist.add(temp);
                                                 if (killedMutants.size() == 1){
+                                                    fmeasure = counter;
                                                     drtMeasure.addFmeasure(counter);
                                                 }else if (killedMutants.size() == partitions[y]){
                                                     drtMeasure.addTmeasure(counter);
-                                                }
+                                                }else if (killedMutants.size() == 2)
+                                                    drtMeasure.addNFmeasure(counter - fmeasure);
                                                 break;
                                             }
                                         }
                                     }
                                     //记录1个测试用例在所有得变异体上执行之后的结果
-//                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],String.valueOf(j),
-//                                            String.valueOf(partition),String.valueOf(bean.getId()),templist,String.valueOf(partitions[y] - killedMutants.size()),String.valueOf(parameters[x]));
+//                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],
+//                                            String.valueOf(j),String.valueOf(partition),String.valueOf(bean.getId()),
+//                                            templist,String.valueOf(partitions[y] - killedMutants.size()),
+//                                            String.valueOf(parameters[x]));
                                     if (killedMutants.size() >= partitions[y]){
                                         break;
                                     }
@@ -198,9 +204,9 @@ public class DRT {
                     long end = System.currentTimeMillis();
                     totaltime += (end - start);
                     double meanTime = Double.parseDouble(decimalFormat.format(totaltime / DIVISOR)) ;
-                    drtLog.recordResult("drtResult.xls",drtMeasure.getMeanFmeasure(),drtMeasure.getMeanTmeasure(),
-                            drtMeasure.getStandardDevOfFmeasure(),drtMeasure.getStandardDevOfTmeasure(),numOfPartitions[i],
-                            parameters[x],meanTime,distribution[y]);
+                    drtLog.recordResult("drtResult.xls",drtMeasure.getMeanFmeasure(),drtMeasure.getMeanNFmeasure(),
+                            drtMeasure.getMeanTmeasure(),drtMeasure.getStandardDevOfFmeasure(),drtMeasure.getStandardDevOfNFmeasure(),
+                            drtMeasure.getStandardDevOfTmeasure(),numOfPartitions[i], parameters[x],meanTime,distribution[y]);
                 }
             }
         }

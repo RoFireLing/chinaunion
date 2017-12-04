@@ -16,11 +16,12 @@ public class MutantSet {
     private static final String CLASS_NAME = "ChinaUnionBill";
     private BinSet[] mutantsList;
     public MutantSet() {
-        mutantsList = new BinSet[5];
+        mutantsList = new BinSet[1];
         for (int i = 0; i < mutantsList.length; i++) {
             mutantsList[i] = new BinSet();
         }
-        String[] txt = {"M50-50.txt","M60-40.txt","M70-30.txt","M80-20.txt","M90-10.txt"};
+//        String[] txt = {"M50-50.txt","M60-40.txt","M70-30.txt","M80-20.txt","M90-10.txt"};
+        String[] txt = {"LowFailureRate.txt"};
         for (int i = 0; i < txt.length; i++) {
             String path = System.getProperty("user.dir")+ separator + "src"+separator+"mutantSet"+separator+txt[i];
             File file = new File(path);
