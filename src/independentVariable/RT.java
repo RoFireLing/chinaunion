@@ -21,7 +21,7 @@ import java.util.List;
 public class RT {
     private static final int SEEDS = 30;
     private static final int TESTTIMES = 30;
-    private static final double DIVID = SEEDS * TESTTIMES;
+    private static final double DIVISOR = SEEDS * TESTTIMES;
     private static final int NUMOFTESTCASES = 900000;
     private static final String ORIGINAL_PACKAGE = "com.lyq.";
     public void randomTesting(){
@@ -37,8 +37,13 @@ public class RT {
             //记录每一个测试序列的测试结果
             RTMeasure rtMeasure = new RTMeasure();
             RTLog rtLog = new RTLog();
-            long totaltime = 0;
-            long start = System.currentTimeMillis();//开始测试的时间
+
+            List<Long> falltime = new ArrayList<Long>();
+
+            List<Long> f2alltime = new ArrayList<Long>();
+
+            List<Long> talltime = new ArrayList<Long>();
+
             for (int i = 0; i < SEEDS; i++) {
                 for (int r = 0; r < TESTTIMES; r++) {
                     //获得变异体集
@@ -57,6 +62,10 @@ public class RT {
                     killedMutants.clear();
                     int counter = 0 ;
                     int fmeasure = 0 ;
+                    long starttemp = System.currentTimeMillis();
+                    long ftime = 0;
+
+
                     for (int j = 0; j < beans.size(); j++) {//每一个测试用例要在所有的变异体上执行
                         System.out.println("test begin:");
                         Bean bean = beans.get(j);//当前测试用例
@@ -96,10 +105,17 @@ public class RT {
                                         if (killedMutants.size() == 1){
                                             fmeasure = counter;
                                             rtMeasure.addFmeasure(counter);
+                                            long ftimeTemp = System.currentTimeMillis();
+                                            ftime = ftimeTemp;
+                                            falltime.add(ftimeTemp - starttemp);
                                         }else if (killedMutants.size() == partitions[y]){
                                             rtMeasure.addTmeasure(counter);
+                                            long ttimeTemp = System.currentTimeMillis();
+                                            talltime.add(ttimeTemp - starttemp);
                                         }else if (killedMutants.size() == 2){
                                             rtMeasure.addNFmeasure(counter - fmeasure);
+                                            long f2timeTemp = System.currentTimeMillis();
+                                            f2alltime.add(f2timeTemp - ftime);
                                         }
                                         break;
                                     }
@@ -126,13 +142,30 @@ public class RT {
                     }
                 }
             }
-            long end = System.currentTimeMillis();
-            totaltime += (end - start);
             DecimalFormat decimalFormat = new DecimalFormat("#.00");
-            double meanTime = Double.parseDouble(decimalFormat.format(totaltime / DIVID)) ;
+            long ftotaltime = 0;
+            for (int j = 0; j < falltime.size(); j++) {
+                ftotaltime += falltime.get(j);
+            }
+            double meanfTime = Double.parseDouble(decimalFormat.format(ftotaltime / DIVISOR));
+
+            long f2totaltime = 0;
+            for (int j = 0; j < f2alltime.size(); j++) {
+                f2totaltime += f2alltime.get(j);
+            }
+            double meanf2time = Double.parseDouble(decimalFormat.format(f2totaltime / DIVISOR));
+
+            long ttotaltime = 0 ;
+
+            for (int j = 0; j < talltime.size(); j++) {
+                ttotaltime += talltime.get(j);
+            }
+            double meantime = Double.parseDouble(decimalFormat.format(ttotaltime / DIVISOR)) ;
+
+
             rtLog.recordResult("RTResult.txt",distribution[y],rtMeasure.getMeanFmeasure(),
                     rtMeasure.getMeanNFmeasure(),rtMeasure.getMeanTmeasure(),rtMeasure.getStandardDevOfFmeasure(),
-                    rtMeasure.getMeanNFmeasure(),rtMeasure.getStandardDevOfTmeasure(),meanTime);
+                    rtMeasure.getMeanNFmeasure(),rtMeasure.getStandardDevOfTmeasure(),meanfTime,meanf2time,meantime);
         }
     }
     public static void main(String[] args) {

@@ -13,6 +13,19 @@ public class DRTMeasure {
     private List<Double> Fmeasure;
     private List<Double> Tmeasure;
     private List<Double> NFmeasure;
+
+    public List<Double> getFmeasure() {
+        return Fmeasure;
+    }
+
+    public List<Double> getTmeasure() {
+        return Tmeasure;
+    }
+
+    public List<Double> getNFmeasure() {
+        return NFmeasure;
+    }
+
     public void addFmeasure(double item){
         Fmeasure.add(item);
     }
