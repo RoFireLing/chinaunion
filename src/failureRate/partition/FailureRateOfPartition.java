@@ -1,4 +1,5 @@
 package failureRate.partition;
+import mutantSet.BinSet;
 import mutantSet.MutantSet;
 import mutantSet.TestMethods;
 import partition.Partition;
@@ -60,6 +61,13 @@ public class FailureRateOfPartition {
 
         //变异体集合
         MutantSet ms = new MutantSet();
+        BinSet[] mutants = new BinSet[1];
+        for (int l = 0; l < mutants.length; l++) {
+            mutants[l] = new BinSet();
+        }
+        mutants = ms.getMutantsList();//获得5中变异体分布的变异体集
+
+
 
         for (int i = 0; i < numOfpartition.length; i++){ //两种分区方式
             //针对每一种分区方式进行循环
@@ -85,33 +93,33 @@ public class FailureRateOfPartition {
 
                                 //逐个遍历变异体进行测试
                                 try{
-                                    for (int z = 0; z < ms.size() && !flag; z++){ //逐个测试变异体集中的每一个变异体
+                                    for (int z = 0; z < mutants[0].size() && !flag; z++){ //逐个测试变异体集中的每一个变异体
                                         //获取原始程序的实例
                                         Class originalClazz = Class.forName(ORIGINAL_PACKAGE+"ChinaUnionBill");
                                         Constructor constructor1 = originalClazz.getConstructor(null);
                                         Object originalInstance = constructor1.newInstance(null);
                                         //获取变异体程序的实例
-                                        Class mutantClazz = Class.forName(ms.getMutantName(z));
+                                        Class mutantClazz = Class.forName(mutants[0].getMutantName(z));
                                         Constructor constructor2 = mutantClazz.getConstructor(null);
                                         Object mutantInstance = constructor2.newInstance(null);
                                         //对一个变异体的所有方法进行遍历
                                         for (int m = 0; m < methodsList.size() && !flag; m++) {
                                             //获取源程序的方法
-                                            Method originalMethod = originalClazz.getMethod(methodsList.get(m), null);
+                                            Method originalMethod = originalClazz.getMethod(methodsList.get(m), char.class,int.class,double.class,int.class,int.class);
 
                                             //获取源程序的测试结果
-                                            Object originalResult = originalMethod.invoke(originalInstance, null);
-                                            Method mutantMethod = mutantClazz.getMethod(methodsList.get(m), null);
+                                            Object originalResult = originalMethod.invoke(originalInstance, bean.getType(),bean.getMonthRent(),bean.getFlow(),bean.getVoiceCall(),bean.getVideoCall());
+                                            Method mutantMethod = mutantClazz.getMethod(methodsList.get(m), char.class,int.class,double.class,int.class,int.class);
                                             //获取目标程序的测试结果
-                                            Object mutantResult = mutantMethod.invoke(mutantInstance, null);
+                                            Object mutantResult = mutantMethod.invoke(mutantInstance, bean.getType(),bean.getMonthRent(),bean.getFlow(),bean.getVoiceCall(),bean.getVideoCall());
 
-                                            if(!originalResult.equals(mutantResult) || count >= 50){ //揭示了软件中的故障
+                                            if(!originalResult.equals(mutantResult) || count >= 2000){ //揭示了软件中的故障
                                                 //记录此时该分区已经使用的测试用例数目
-                                                if (count < 50) {
+                                                if (count < 2000) {
                                                     recordCount.add(count);
                                                     flag = true;//找到了故障，进行下一次重复试验
                                                 }else {
-                                                    recordCount.add(1000);
+                                                    recordCount.add(5000);
                                                     flag = true;//到达该分区的执行上限，认为该分区几乎没有揭示故障的能力
                                                 }
 
