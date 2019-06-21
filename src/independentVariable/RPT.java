@@ -21,8 +21,8 @@ import java.util.Random;
  * @author phantom
  */
 public class RPT {
-    private static final int SEEDS = 30 ;
-    private static final int TESTTIMES = 30 ;
+    private static final int SEEDS = 1 ;
+    private static final int TESTTIMES = 3 ;
     private static final double DIVISOR = SEEDS * TESTTIMES;
     private static final String ORIGINAL_PACKAGE = "com.lyq.";
     private static final int NUMOFTESTCASES = 900000;
@@ -37,7 +37,8 @@ public class RPT {
 //        String[] distribution = {"M50-50","M60-40","M70-30","M80-20","M90-10"};
         String[] distribution = {"LowFailureRate"};
         RPTLog rptLog = new RPTLog();
-        int[] numOfPartitions = {20,3};
+//        int[] numOfPartitions = {20,3};
+        int[] numOfPartitions = {20};
         Partition rptPartition = new Partition();
 
         for (int y = 0; y < distribution.length; y++) {//对不同的变异体集进行测试
@@ -82,7 +83,7 @@ public class RPT {
                                 bean = beans.get(l++);
                             }while(!rptPartition.isBelongToOneOfPartition(bean,numOfPartitions[i],partition));
                             //将测试用例初始化
-                            System.out.println("test begin:");
+//                            System.out.println("test begin:");
                             counter++;//测试用例的计数器
                             //接下来开始逐个遍历变异体
                             try{
@@ -155,6 +156,7 @@ public class RPT {
                 for (int j = 0; j < falltime.size(); j++) {
                     ftotaltime += falltime.get(j);
                 }
+                System.out.println(ftotaltime);
                 double meanfTime = Double.parseDouble(decimalFormat.format(ftotaltime / DIVISOR));
 
                 long f2totaltime = 0;

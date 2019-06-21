@@ -21,8 +21,8 @@ import java.util.Random;
  * @author phantom
  */
 public class DRT {
-    private static final int SEEDS = 30 ;
-    private static final int TESTTIMES = 30 ;
+    private static final int SEEDS = 20 ;
+    private static final int TESTTIMES = 20 ;
     private static final double DIVISOR = SEEDS * TESTTIMES;
     private static final String ORIGINAL_PACKAGE = "com.lyq.";
     private static final int NUMOFTESTCASES = 900000;
@@ -96,11 +96,13 @@ public class DRT {
 //        String[] distribution = {"M50-50"};
         DRTLog drtLog = new DRTLog();
         int[] numOfPartitions = {20,3};
+//        int[] numOfPartitions = {20};
 //        int[] numOfPartitions = {3};
         Partition rptPartition = new Partition();
         double[] parameters = {0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.01,0.05,0.1,0.2,0.3,0.4,0.5};
-//        double[] parameters = {0.00001};
-
+//        double[] parameters = {0.01,0.5};
+//        double[] parameters = {0.01001,0.006364,0.004664,0.003680,0.003040};
+//        double[] parameters = {0.3,0.4,0.5};
         for (int y = 0; y < distribution.length; y++) {//对不同的变异体集进行测试
             for (int i = 0; i < numOfPartitions.length; i++) {
                 for (int x = 0; x < parameters.length; x++) {
@@ -199,10 +201,10 @@ public class DRT {
                                         }
                                     }
                                     //记录1个测试用例在所有得变异体上执行之后的结果
-                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],
-                                            String.valueOf(j),String.valueOf(partition),String.valueOf(bean.getId()),
-                                            templist,String.valueOf(partitions[y] - killedMutants.size()),
-                                            String.valueOf(parameters[x]));
+//                                    drtLog.recordProcessInfo("drt_log.txt",distribution[y],
+////                                            String.valueOf(j),String.valueOf(partition),String.valueOf(bean.getId()),
+////                                            templist,String.valueOf(partitions[y] - killedMutants.size()),
+////                                            String.valueOf(parameters[x]));
                                     if (killedMutants.size() >= partitions[y]){
                                         break;
                                     }

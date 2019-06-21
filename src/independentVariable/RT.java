@@ -162,7 +162,6 @@ public class RT {
             }
             double meantime = Double.parseDouble(decimalFormat.format(ttotaltime / DIVISOR)) ;
 
-
             rtLog.recordResult("RTResult.txt",distribution[y],rtMeasure.getMeanFmeasure(),
                     rtMeasure.getMeanNFmeasure(),rtMeasure.getMeanTmeasure(),rtMeasure.getStandardDevOfFmeasure(),
                     rtMeasure.getMeanNFmeasure(),rtMeasure.getStandardDevOfTmeasure(),meanfTime,meanf2time,meantime);
